@@ -43,9 +43,6 @@ class GUI():
         self.list_of_apps = [
             'Empty',
             'Amenity Detection',
-            # 'Object Detection',
-            # 'Face Detection',
-            # 'Fire Detection'
             ]
         self.guiParam = {}
 
@@ -170,13 +167,6 @@ class AppManager:
                 self.objApp = plugins.Object_Detection_YOLO(self.paramDefaultYOLOv4)
 
             elif self.model == 'Fine_tuned_YOLOv4':
-                # self.paramFineTunedYOLOv4 = dict(labels='models/amenity_yolov4/amenity.names',
-                #                           modelCfg='models/amenity_yolov4/amenity_yolov4.cfg',
-                #                           modelWeights="models/amenity_yolov4/amenity_yolov4.weights",
-                #                           confThresh=self.guiParam['confThresh'],
-                #                           nmsThresh=self.guiParam['nmsThresh'])
-
-                # self.objApp = plugins.Object_Detection_YOLO(self.paramFineTunedYOLOv4)
 
                 self.paramFineTunedYOLOv4 = dict(labels='models/amenity_yolov4/amenity.names',
                                           modelCfg='models/amenity_yolov4/amenity_yolov4.cfg',
@@ -231,16 +221,17 @@ class DataManager:
         self.guiParam = guiParam
 
         self.url_demo_images = {
-            "NY-City": "https://s4.thingpic.com/images/8a/Qcc4eLESvtjiGswmQRQ8ynCM.jpeg",
-            "Paris-street": "https://www.discoverwalks.com/blog/wp-content/uploads/2018/08/best-streets-in-paris.jpg",
-            "Paris-street2": "https://www.discoverwalks.com/blog/wp-content/uploads/2018/08/best-streets-in-paris.jpg"}
+            "Living-Room": "https://a0.muscache.com/im/pictures/6080d6b0-1cb6-4f44-9776-1892e99c9c81.jpg?aki_policy=xx_large",
+            "Living-Room-2":"https://i.pinimg.com/originals/ed/74/3f/ed743f301349446587428a5553a4ce56.jpg",
+            "Wine-rack" : "https://imagesvc.meredithcorp.io/v3/mm/image?q=85&c=sc&poi=face&w=1871&h=980&url=https%3A%2F%2Fstatic.onecms.io%2Fwp-content%2Fuploads%2Fsites%2F9%2F2019%2F01%2Fwine-racks-main-HP-BLOG0220.jpg",
+            "Kitchen": "https://hgtvhome.sndimg.com/content/dam/images/hgtv/fullset/2018/4/23/1/HUHH2018-Curb-Appeal_Seattle-WA_11.jpg.rend.hgtvcom.966.644.suffix/1524514638493.jpeg",
+            "Bathroom": "https://www.thespruce.com/thmb/5u0qWkAXxlIFM2kYS73Db_4ZImE=/1000x562/smart/filters:no_upscale()/smallbathroomwithgreattextures-6cf9756c3ede44969e02b60f7ad7242d.jpg"}
 
-        self.demo_image_examples = {"Family-picture": "./data/family.jpg",
-                                    "Fire": "./data/fire.jpg",
-                                    "Dog": "./data/dog.jpg",
-                                    "Crosswalk": "./data/demo.jpg",
-                                    "Cat": "./data/cat.jpg",
-                                    "Car on fire": "./data/car_on_fire.jpg"}
+        self.demo_image_examples = {"Bedroom": "./data/demo-bedroom.jpg",
+                                    "Coffeemaker": "./data/demo-coffee.jpg",
+                                    "Kitchen": "./data/demo-kitchen.jpg",
+                                    "Pool": "./data/demo-pool.jpg",
+                                    "Living_room": "./data/demo-living.png",}
 
         self.image = None
         self.data = None
