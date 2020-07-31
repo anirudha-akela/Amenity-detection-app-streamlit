@@ -42,9 +42,11 @@ class GUI():
 
         self.list_of_apps = [
             'Empty',
-            'Object Detection',
-            'Face Detection',
-            'Fire Detection']
+            'Amenity Detection',
+            # 'Object Detection',
+            # 'Face Detection',
+            # 'Fire Detection'
+            ]
         self.guiParam = {}
 
     # ----------------------------------------------------------------
@@ -60,7 +62,7 @@ class GUI():
         """
         User Interface Management: Sidebar
         """
-        st.image("./media/logo_inveesion.png","InVeesion.", width=50)
+        # st.image("./media/logo_inveesion.png","InVeesion.", width=50)
 
         st.title(title)
 
@@ -70,7 +72,7 @@ class GUI():
         self.appType = 'Image Applications'
 
         self.dataSource = st.sidebar.radio(
-                'Please select the source of your ' + self.appType, ['Image: Demo', 'Image: Upload', 'Image: URL'])
+                'Please select the source of your ' + self.appType, ['Use Demo Images', 'Upload image from local machine', 'Image URL'])
 
 
         # Get the application from the GUI
@@ -78,7 +80,7 @@ class GUI():
             'Chose an AI Application', self.list_of_apps)
 
         if self.selectedApp is 'Empty':
-            st.sidebar.warning('Select an application from the list')
+            st.sidebar.warning('Please select Amenity Detection above')
 
         self.displayFlag = st.sidebar.checkbox(
             'Display Real-Time Results', value=True)
@@ -96,91 +98,41 @@ class GUI():
 
         st.header(' :arrow_right: Application: {}'.format(self.selectedApp))
 
-        if self.selectedApp == 'Object Detection':
+        if self.selectedApp == 'Amenity Detection':
             st.info(
-                'This application performs object detection using advanced deep learning models. It can detects more than 80 object from COCO dataset.')
-            self.sidebarObjectDetection()
-
-        elif self.selectedApp == 'Face Detection':
-            st.info(
-                "This application performs face detection using advanced deep learning models. It can detects face in the image")
-            self.sidebarFaceDetection()
-
-        elif self.selectedApp == 'Fire Detection':
-            st.info(
-                'This application performs fire detection using advanced deep learning models. ')
-            self.sidebarFireDetection()
+                'This web application performs object detection using advanced deep learning models. It can detect 30 classes of common household objects from OpenImages dataset.')
+            self.sidebarAmenityDetection()
 
         else:
             st.info(
-                'To start using InVeesion dashboard you must first select an Application from the sidebar menu other than Empty')
+                'To start using this web application you must first select Amenity Detection from the sidebar menu.')
 
     # --------------------------------------------------------------------------
     def sidebarEmpty(self):
         pass
     # --------------------------------------------------------------------------
 
-    def sidebarFaceDetection(self):
-        """
-        """
 
-        # st.sidebar.markdown("### :arrow_right: Model")
-        # --------------------------------------------------------------------------
-        model = st.sidebar.selectbox(
-            label='Select the model',
-            options=('res10_300x300_ssd_iter_140000', 'opencv_face_detector'))
+    def sidebarAmenityDetection(self):
 
-        st.sidebar.markdown("### :arrow_right: Parameters")
-        # --------------------------------------------------------------------------
-        confThresh = st.sidebar.slider(
-            'Confidence', value=0.80, min_value=0.0, max_value=1.00, step=0.05)
-
-        self.guiParam.update(dict(confThresh=confThresh,
-                                  model=model))
-
-    # --------------------------------------------------------------------------
-
-    def sidebarObjectDetection(self):
-
-        # st.sidebar.markdown("### :arrow_right: Model")
+        st.sidebar.markdown("### :arrow_right: Model")
         #------------------------------------------------------#
         model = st.sidebar.selectbox(
             label='Select the model',
-            options=['Caffe-MobileNetSSD', 'Darknet-YOLOv3-tiny', 'Darknet-YOLOv3'])
+            options=['Default_YOLOv4', 'Fine_tuned_YOLOv4', 'Fine_tuned_YOLOv4_tiny'])
 
+        st.sidebar.markdown("### :arrow_right: Model Parameters")
         #------------------------------------------------------#
         confThresh = st.sidebar.slider(
-            'Confidence', value=0.3, min_value=0.0, max_value=1.0)
+            'Select the Confidence threshold', value=0.3, min_value=0.0, max_value=1.0)
         nmsThresh = st.sidebar.slider(
-            'Non-maximum suppression', value=0.30, min_value=0.0, max_value=1.00, step=0.05)
+            'Select the Non-maximum suppression threshold', value=0.30, min_value=0.0, max_value=1.00, step=0.05)
 
         self.guiParam.update(dict(confThresh=confThresh,
                                   nmsThresh=nmsThresh,
                                   model=model,
                                   #   desired_object=desired_object
                                   ))
-
-    # --------------------------------------------------------------------------
-
-    def sidebarFireDetection(self):
-
-        # st.sidebar.markdown("### :arrow_right: Model")
-        #------------------------------------------------------#
-        model = st.sidebar.selectbox(
-            label='Select the model',
-            options=['Darknet-YOLOv3-tiny'])
-
-        # st.sidebar.markdown("### :arrow_right: Model Parameters")
-        #------------------------------------------------------#
-        confThresh = st.sidebar.slider(
-            'Confidence', value=0.5, min_value=0.0, max_value=1.0)
-        nmsThresh = st.sidebar.slider(
-            'Non-maximum suppression', value=0.30, min_value=0.0, max_value=1.00, step=0.05)
-
-        self.guiParam.update(dict(confThresh=confThresh,
-                                  nmsThresh=nmsThresh,
-                                  model=model))
-
 
 # ------------------------------------------------------------------
 # ------------------------------------------------------------------
@@ -205,78 +157,48 @@ class AppManager:
         #
         """
 
-        if self.selectedApp == 'Object Detection':
+        if self.selectedApp == 'Amenity Detection':
 
-            if self.model == 'Caffe-MobileNetSSD':
+            if self.model == 'Default_YOLOv4':
 
-                self.paramMobileNetSSD = dict(
-                    prototxt="models/MobileNetSSD_deploy.prototxt.txt",
-                    caffeModel="models/MobileNetSSD_deploy.caffemodel",
-                    confThresh=self.guiParam["confThresh"])
-
-                self.objApp = plugins.Object_Detection_MobileNetSSD(
-                    self.paramMobileNetSSD)
-
-            elif self.model == 'Darknet-YOLOv3':
-                self.paramYolo = dict(labels='models/DarkNet/coco.names',
-                                      modelCfg="models/DarkNet/yolov3.cfg",
-                                      modelWeights="models/DarkNet/yolov3.weights",
-                                      confThresh=self.guiParam['confThresh'],
-                                      nmsThresh=self.guiParam['nmsThresh'])
-
-                self.objApp = plugins.Object_Detection_YOLO(self.paramYolo)
-
-            elif self.model == 'Darknet-YOLOv3-tiny':
-                self.paramYoloTiny = dict(labels='models/DarkNet/coco.names',
-                                          modelCfg='models/DarkNet/yolov3-tiny.cfg',
-                                          modelWeights="models/DarkNet/yolov3-tiny.weights",
+                self.paramDefaultYOLOv4 = dict(labels='models/default_yolov4/coco.names',
+                                          modelCfg='models/default_yolov4/yolov4.cfg',
+                                          modelWeights="models/default_yolov4/yolov4.weights",
                                           confThresh=self.guiParam['confThresh'],
                                           nmsThresh=self.guiParam['nmsThresh'])
 
-                self.objApp = plugins.Object_Detection_YOLO(self.paramYoloTiny)
+                self.objApp = plugins.Object_Detection_YOLO(self.paramDefaultYOLOv4)
+
+            elif self.model == 'Fine_tuned_YOLOv4':
+                # self.paramFineTunedYOLOv4 = dict(labels='models/amenity_yolov4/amenity.names',
+                #                           modelCfg='models/amenity_yolov4/amenity_yolov4.cfg',
+                #                           modelWeights="models/amenity_yolov4/amenity_yolov4.weights",
+                #                           confThresh=self.guiParam['confThresh'],
+                #                           nmsThresh=self.guiParam['nmsThresh'])
+
+                # self.objApp = plugins.Object_Detection_YOLO(self.paramFineTunedYOLOv4)
+
+                self.paramFineTunedYOLOv4 = dict(labels='models/amenity_yolov4/amenity.names',
+                                          modelCfg='models/amenity_yolov4/amenity_yolov4.cfg',
+                                          modelWeights="models/amenity_yolov4/amenity_yolov4.weights",
+                                          confThresh=self.guiParam['confThresh'],
+                                          nmsThresh=self.guiParam['nmsThresh'])
+
+                self.objApp = plugins.Object_Detection_YOLO(self.paramFineTunedYOLOv4)
+
+            elif self.model == 'Fine_tuned_YOLOv4_tiny':
+                self.paramFineTunedYOLOv4Tiny = dict(labels='models/amenity_yolov4_tiny/amenity.names',
+                                          modelCfg='models/amenity_yolov4_tiny/amenity_yolov4_tiny.cfg',
+                                          modelWeights="models/amenity_yolov4_tiny/amenity_yolov4_tiny.weights",
+                                          confThresh=self.guiParam['confThresh'],
+                                          nmsThresh=self.guiParam['nmsThresh'])
+
+                self.objApp = plugins.Object_Detection_YOLO(self.paramFineTunedYOLOv4Tiny)
 
             else:
                 raise ValueError(
                     '[Error] Please selected one of the listed models')
 
-        # -----------------------------------------------------
-
-        elif self.selectedApp == 'Face Detection':
-
-            if self.model == 'res10_300x300_ssd_iter_140000':
-
-                self.param = dict(
-                    prototxt="models/deploy.prototxt.txt",
-                    caffeModel="models/res10_300x300_ssd_iter_140000.caffemodel",
-                    confThresh=self.guiParam["confThresh"])
-
-                self.objApp = plugins.Face_Detection(self.param)
-            else:
-                raise ValueError(
-                    "[Error] Please selection one of the listed models")
-
-        # -----------------------------------------------------
-
-        elif self.selectedApp == 'Fire Detection':
-            @st.cache(allow_output_mutation=True)
-            def getClasses(classesFile):
-                """
-                # Load names of classes
-                """
-                classes = None
-                with open(classesFile, 'rt') as f:
-                    classes = f.read().rstrip('\n').split('\n')
-                return classes
-
-            labels = 'models/DarkNet/fire_detection/yolov3-tiny_obj.names'
-            self.paramYoloTinyFire = dict(labels=labels,
-                                          modelCfg='models/DarkNet/fire_detection/yolov3-tiny-obj.cfg',
-                                          modelWeights="models/DarkNet/fire_detection/yolov3-tiny-obj_final.weights",
-                                          confThresh=self.guiParam['confThresh'],
-                                          nmsThresh=self.guiParam['nmsThresh'],
-                                          colors=np.tile(colorBlue, (len(getClasses(labels)), 1)).tolist())
-
-            self.objApp = plugins.Object_Detection_YOLO(self.paramYoloTinyFire)
 
         # -----------------------------------------------------
 
@@ -328,9 +250,10 @@ class DataManager:
 
     def load_image_source(self):
         """
+        'Use Demo Images', 'Upload image from local machine', 'Image URL'
         """
 
-        if self.guiParam["dataSource"] == 'Image: Demo':
+        if self.guiParam["dataSource"] == 'Use Demo Images':
 
             @st.cache(allow_output_mutation=True)
             def load_image_from_path(image_path):
@@ -355,7 +278,7 @@ class DataManager:
             #--------------------------------------------#
             #--------------------------------------------#
 
-        elif self.guiParam["dataSource"] == 'Image: Upload':
+        elif self.guiParam["dataSource"] == 'Upload image from local machine':
 
             @st.cache(allow_output_mutation=True)
             def load_image_from_upload(file):
@@ -373,7 +296,7 @@ class DataManager:
             #--------------------------------------------#
             #--------------------------------------------#
 
-        elif self.guiParam["dataSource"] == 'Image: URL':
+        elif self.guiParam["dataSource"] == 'Image URL':
 
             @st.cache(allow_output_mutation=True)
             def load_image_from_url(url_image):
@@ -419,6 +342,3 @@ class DataManager:
                 '[Error] Please select of the two Application pipelines')
 
         return self.data
-
-
-

@@ -9,7 +9,7 @@ import cv2 as cv
 import streamlit as st
 
 
-from libraries.plugins import Motion_Detection
+# from libraries.plugins import Motion_Detection
 from libraries.utils import GUI, AppManager, DataManager
 
 #------------------------------------------------------#
