@@ -55,7 +55,7 @@ class GUI():
 
     # ------------------------------------a----------------------------
 
-    def common_config(self, title='Dashboard '): #(Beta version :golf:)
+    def common_config(self, title=':computer: Amenity Detection Dashboard '): #(Beta version :golf:)
         """
         User Interface Management: Sidebar
         """
@@ -63,7 +63,7 @@ class GUI():
 
         st.title(title)
 
-        st.sidebar.markdown("### :arrow_right: Settings")
+        st.sidebar.markdown("### :heavy_exclamation_mark::heavy_exclamation_mark::heavy_exclamation_mark: Settings")
 
         # Get the application type from the GUI
         self.appType = 'Image Applications'
@@ -77,7 +77,7 @@ class GUI():
             'Chose an AI Application', self.list_of_apps)
 
         if self.selectedApp is 'Empty':
-            st.sidebar.warning('Please select Amenity Detection above')
+            st.sidebar.warning(':warning: Please select Amenity Detection above')
 
         self.displayFlag = st.sidebar.checkbox(
             'Display Real-Time Results', value=True)
@@ -93,11 +93,11 @@ class GUI():
 
     def appDescription(self):
 
-        st.header(' :arrow_right: Application: {}'.format(self.selectedApp))
+        # st.header(' :arrow_right: Application: {}'.format(self.selectedApp))
 
         if self.selectedApp == 'Amenity Detection':
             st.info(
-                'This web application performs object detection using advanced deep learning models. It can detect 30 classes of common household objects from OpenImages dataset.')
+                'This web application performs object detection using advanced deep learning models. It can detect 30 classes of common household objects from the OpenImages dataset.')
             self.sidebarAmenityDetection()
 
         else:
@@ -112,13 +112,13 @@ class GUI():
 
     def sidebarAmenityDetection(self):
 
-        st.sidebar.markdown("### :arrow_right: Model")
+        st.sidebar.markdown("### :hammer_and_wrench: Model")
         #------------------------------------------------------#
         model = st.sidebar.selectbox(
             label='Select the model',
-            options=['Default_YOLOv4', 'Fine_tuned_YOLOv4', 'Fine_tuned_YOLOv4_tiny'])
+            options=[ 'Amenity_YOLOv4'])             # 'Default_YOLOv4', 'Fine_tuned_YOLOv4_tiny'
 
-        st.sidebar.markdown("### :arrow_right: Model Parameters")
+        st.sidebar.markdown("### :control_knobs: Model Parameters")
         #------------------------------------------------------#
         confThresh = st.sidebar.slider(
             'Select the Confidence threshold', value=0.3, min_value=0.0, max_value=1.0)
@@ -166,7 +166,7 @@ class AppManager:
 
                 self.objApp = plugins.Object_Detection_YOLO(self.paramDefaultYOLOv4)
 
-            elif self.model == 'Fine_tuned_YOLOv4':
+            elif self.model == 'Amenity_YOLOv4':
 
                 self.paramFineTunedYOLOv4 = dict(labels='models/amenity_yolov4/amenity.names',
                                           modelCfg='models/amenity_yolov4/amenity_yolov4.cfg',
@@ -187,7 +187,7 @@ class AppManager:
 
             else:
                 raise ValueError(
-                    '[Error] Please selected one of the listed models')
+                    '[Error] Please select one of the listed models')
 
 
         # -----------------------------------------------------
