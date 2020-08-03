@@ -116,7 +116,7 @@ class GUI():
         #------------------------------------------------------#
         model = st.sidebar.selectbox(
             label='Select the model',
-            options=[ 'Amenity_YOLOv4'])             # 'Default_YOLOv4', 'Fine_tuned_YOLOv4_tiny'
+            options=[ 'Amenity_YOLOv4', 'Default_YOLOv3'])             # 'Default_YOLOv4', 'Fine_tuned_YOLOv4_tiny'
 
         st.sidebar.markdown("### :control_knobs: Model Parameters")
         #------------------------------------------------------#
@@ -134,6 +134,55 @@ class GUI():
 # ------------------------------------------------------------------
 # ------------------------------------------------------------------
 
+
+EXTERNAL_DEPENDENCIES = {
+    "yolov3.weights": {
+        "url": "https://pjreddie.com/media/files/yolov3.weights",
+        "size": 248007048
+    },
+    "yolov3.cfg": {
+        "url": "https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov3.cfg",
+        "size": 8342
+    }
+}
+
+# This file downloader demonstrates Streamlit animation.
+def download_file(file_path):
+    # Don't download the file twice. (If possible, verify the download using the file length.)
+    if os.path.exists(file_path):
+        if "size" not in EXTERNAL_DEPENDENCIES[file_path]:
+            return
+        elif os.path.getsize(file_path) == EXTERNAL_DEPENDENCIES[file_path]["size"]:
+            return
+
+    # These are handles to two visual elements to animate.
+    weights_warning, progress_bar = None, None
+    try:
+        weights_warning = st.warning("Downloading %s..." % file_path)
+        progress_bar = st.progress(0)
+        with open(file_path, "wb") as output_file:
+            with urllib.request.urlopen(EXTERNAL_DEPENDENCIES[file_path]["url"]) as response:
+                length = int(response.info()["Content-Length"])
+                counter = 0.0
+                MEGABYTES = 2.0 ** 20.0
+                while True:
+                    data = response.read(8192)
+                    if not data:
+                        break
+                    counter += len(data)
+                    output_file.write(data)
+
+                    # We perform animation by overwriting the elements.
+                    weights_warning.warning("Downloading %s... (%6.2f/%6.2f MB)" %
+                        (file_path, counter / MEGABYTES, length / MEGABYTES))
+                    progress_bar.progress(min(counter / length, 1.0))
+
+    # Finally, we remove these visual elements by calling .empty().
+    finally:
+        if weights_warning is not None:
+            weights_warning.empty()
+        if progress_bar is not None:
+            progress_bar.empty()
 
 class AppManager:
     """
@@ -156,11 +205,15 @@ class AppManager:
 
         if self.selectedApp == 'Amenity Detection':
 
-            if self.model == 'Default_YOLOv4':
+            # Download external dependencies.
+            for filename in EXTERNAL_DEPENDENCIES.keys():
+                download_file(filename)
+
+            if self.model == 'Default_YOLOv3':
 
                 self.paramDefaultYOLOv4 = dict(labels='models/default_yolov4/coco.names',
-                                          modelCfg='models/default_yolov4/yolov4.cfg',
-                                          modelWeights="models/default_yolov4/yolov4.weights",
+                                          modelCfg="yolov3.cfg", 
+                                          modelWeights="yolov3.weights",
                                           confThresh=self.guiParam['confThresh'],
                                           nmsThresh=self.guiParam['nmsThresh'])
 
@@ -168,22 +221,22 @@ class AppManager:
 
             elif self.model == 'Amenity_YOLOv4':
 
-                self.paramFineTunedYOLOv4 = dict(labels='models/amenity_yolov4/amenity.names',
-                                          modelCfg='models/amenity_yolov4/amenity_yolov4.cfg',
-                                          modelWeights="models/amenity_yolov4/amenity_yolov4.weights",
+                self.paramFineTunedYOLOv4 = dict(labels='models/default_yolov4/coco.names',
+                                          modelCfg="yolov3.cfg", 
+                                          modelWeights="yolov3.weights",
                                           confThresh=self.guiParam['confThresh'],
                                           nmsThresh=self.guiParam['nmsThresh'])
 
                 self.objApp = plugins.Object_Detection_YOLO(self.paramFineTunedYOLOv4)
 
-            elif self.model == 'Fine_tuned_YOLOv4_tiny':
-                self.paramFineTunedYOLOv4Tiny = dict(labels='models/amenity_yolov4_tiny/amenity.names',
-                                          modelCfg='models/amenity_yolov4_tiny/amenity_yolov4_tiny.cfg',
-                                          modelWeights="models/amenity_yolov4_tiny/amenity_yolov4_tiny.weights",
-                                          confThresh=self.guiParam['confThresh'],
-                                          nmsThresh=self.guiParam['nmsThresh'])
+            # elif self.model == 'Fine_tuned_YOLOv4_tiny':
+            #     self.paramFineTunedYOLOv4Tiny = dict(labels='models/amenity_yolov4_tiny/amenity.names',
+            #                               modelCfg='models/amenity_yolov4_tiny/amenity_yolov4_tiny.cfg',
+            #                               modelWeights="models/amenity_yolov4_tiny/amenity_yolov4_tiny.weights",
+            #                               confThresh=self.guiParam['confThresh'],
+            #                               nmsThresh=self.guiParam['nmsThresh'])
 
-                self.objApp = plugins.Object_Detection_YOLO(self.paramFineTunedYOLOv4Tiny)
+            #     self.objApp = plugins.Object_Detection_YOLO(self.paramFineTunedYOLOv4Tiny)
 
             else:
                 raise ValueError(
@@ -197,6 +250,7 @@ class AppManager:
                 '[Error] Please select one of the listed application')
 
         return self.objApp
+
 
     # -----------------------------------------------------
     # -----------------------------------------------------
