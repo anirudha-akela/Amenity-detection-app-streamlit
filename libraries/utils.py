@@ -229,14 +229,14 @@ class AppManager:
 
                 self.objApp = plugins.Object_Detection_YOLO(self.paramFineTunedYOLOv4)
 
-            # elif self.model == 'Fine_tuned_YOLOv4_tiny':
-            #     self.paramFineTunedYOLOv4Tiny = dict(labels='models/amenity_yolov4_tiny/amenity.names',
-            #                               modelCfg='models/amenity_yolov4_tiny/amenity_yolov4_tiny.cfg',
-            #                               modelWeights="models/amenity_yolov4_tiny/amenity_yolov4_tiny.weights",
-            #                               confThresh=self.guiParam['confThresh'],
-            #                               nmsThresh=self.guiParam['nmsThresh'])
+            elif self.model == 'Fine_tuned_YOLOv4_tiny':
+                self.paramFineTunedYOLOv4Tiny = dict(labels='models/amenity_yolov4_tiny/amenity.names',
+                                          modelCfg='models/amenity_yolov4_tiny/amenity_yolov4_tiny.cfg',
+                                          modelWeights="models/amenity_yolov4_tiny/amenity_yolov4_tiny.weights",
+                                          confThresh=self.guiParam['confThresh'],
+                                          nmsThresh=self.guiParam['nmsThresh'])
 
-            #     self.objApp = plugins.Object_Detection_YOLO(self.paramFineTunedYOLOv4Tiny)
+                self.objApp = plugins.Object_Detection_YOLO(self.paramFineTunedYOLOv4Tiny)
 
             else:
                 raise ValueError(
