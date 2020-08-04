@@ -42,7 +42,7 @@ class GUI():
 
         self.list_of_apps = [
             'Empty',
-            'Amenity Detection',
+            'Amenity Detection'
             ]
         self.guiParam = {}
 
@@ -158,7 +158,7 @@ def download_file(file_path):
     # These are handles to two visual elements to animate.
     weights_warning, progress_bar = None, None
     try:
-        weights_warning = st.warning("Downloading %s..." % file_path)
+        weights_warning = st.warning("Loading %s..." % file_path)
         progress_bar = st.progress(0)
         with open(file_path, "wb") as output_file:
             with urllib.request.urlopen(EXTERNAL_DEPENDENCIES[file_path]["url"]) as response:
@@ -173,7 +173,7 @@ def download_file(file_path):
                     output_file.write(data)
 
                     # We perform animation by overwriting the elements.
-                    weights_warning.warning("Downloading %s... (%6.2f/%6.2f MB)" %
+                    weights_warning.warning("Loading %s... (%6.2f/%6.2f MB)" %
                         (file_path, counter / MEGABYTES, length / MEGABYTES))
                     progress_bar.progress(min(counter / length, 1.0))
 
@@ -221,9 +221,9 @@ class AppManager:
 
             elif self.model == 'Amenity_YOLOv4':
 
-                self.paramFineTunedYOLOv4 = dict(labels='models/default_yolov4/coco.names',
-                                          modelCfg="yolov3.cfg", 
-                                          modelWeights="yolov3.weights",
+                self.paramFineTunedYOLOv4 = dict(labels='models/amenity_yolov4/amenity.names',
+                                          modelCfg="models/amenity_yolov4/amenity_yolov4.cfg", 
+                                          modelWeights="models/amenity_yolov4/amenity_yolov4.weights",
                                           confThresh=self.guiParam['confThresh'],
                                           nmsThresh=self.guiParam['nmsThresh'])
 
